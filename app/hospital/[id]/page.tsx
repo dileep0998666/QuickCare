@@ -91,7 +91,7 @@ export default function HospitalPage() {
 
   const fetchReviews = async () => {
     try {
-      const res = await fetch(`/api/hospitals/${hospitalId}/reviews`)
+      const res = await fetch(`/api/hospitals/${hospitalId}/review`)
       const data = await res.json()
       if (res.ok) {
         setReviews(data.reviews || [])
