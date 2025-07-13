@@ -301,19 +301,23 @@ export default function HospitalPage() {
         <div className="mb-10">
           <h3 className="text-xl font-semibold text-slate-700 mb-4">Patient Reviews</h3>
           {reviews.length > 0 ? (
-            reviews.map((r, idx) => (
-              <div key={idx} className="mb-4 border-b pb-2">
-                <div className="flex items-center gap-2 text-yellow-500">
-                  {Array.from({ length: r.rating }, (_, i) => (
-                    <span key={i}>★</span>
-                  ))}
-                </div>
-                <p className="text-slate-700 text-sm mt-1">{r.comment}</p>
-              </div>
-            ))
-          ) : (
-            <p className="text-slate-500 text-sm">No reviews yet.</p>
-          )}
+  reviews.map((r, idx) => (
+    <div key={idx} className="mb-4 border-b pb-2">
+      <div className="flex items-center gap-2">
+        <span className="font-semibold text-slate-800">{r.userId?.name || "Anonymous"}</span>
+        <div className="flex items-center gap-1 text-yellow-500">
+          {Array.from({ length: r.rating }, (_, i) => (
+            <span key={i}>★</span>
+          ))}
+        </div>
+      </div>
+      <p className="text-slate-700 text-sm mt-1">{r.comment}</p>
+    </div>
+  ))
+) : (
+  <p className="text-slate-500 text-sm">No reviews yet.</p>
+)}
+
         </div>
 
         {/* Review Form */}

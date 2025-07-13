@@ -55,7 +55,7 @@ interface PaymentResult {
   message?: string
 }
 
-export function BookingModalUpdated({ doctor, hospital, onClose }: BookingModalProps) {
+export function BookingModal({ doctor, hospital, onClose }: BookingModalProps) {
   const router = useRouter()
   const { user } = useAuth()
   const [step, setStep] = useState<"form" | "payment" | "success">("form")
@@ -146,7 +146,7 @@ export function BookingModalUpdated({ doctor, hospital, onClose }: BookingModalP
       }
     } catch (error) {
       console.error("Booking error:", error)
-      alert(error.message || "An error occurred. Please try again.")
+      alert(error instanceof Error ? error.message : "An error occurred. Please try again.")
     } finally {
       setLoading(false)
     }

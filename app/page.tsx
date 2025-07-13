@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button"
 import { MapPin, Users, Star, Phone, Menu, X, Heart, Shield, Clock, Mail, MessageCircle, Facebook, Twitter, Instagram, Linkedin, CheckCircle, Zap, Globe, Building, Calendar, Award } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/auth-context"
+
 
 const availableCities = [
   { id: "hyderabad", name: "Hyderabad", available: true },
@@ -22,6 +24,8 @@ export default function HomePage() {
   const [headerVisible, setHeaderVisible] = useState(true)
   const [lastScrollY, setLastScrollY] = useState(0)
   const router = useRouter()
+  const { user, loading } = useAuth()
+
 
   // Handle header visibility on scroll
   useEffect(() => {
@@ -108,10 +112,18 @@ export default function HomePage() {
               </nav>
 
               {/* System Status - Right aligned */}
-              <div className="hidden md:flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-green-200 text-sm font-medium">System Online</span>
-              </div>
+                    <div className="hidden md:flex items-center space-x-4">
+        {!loading && !user ? (
+          <Link href="/login">
+            <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700">
+              Login
+            </Button>
+          </Link>
+        ) : (
+          <span className="text-green-200 text-sm font-medium">Welcome, {user?.name}</span>
+        )}
+      </div>
+
 
               {/* Mobile menu button */}
               <button

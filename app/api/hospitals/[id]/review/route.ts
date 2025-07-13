@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Error submitting review:", error)
 
-    if (error.code === 11000) {
+    if (typeof error === "object" && error !== null && "code" in error && (error as any).code === 11000) {
       return NextResponse.json({ success: false, message: "You have already reviewed this hospital" }, { status: 409 })
     }
 

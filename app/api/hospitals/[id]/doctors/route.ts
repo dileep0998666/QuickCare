@@ -29,6 +29,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     return NextResponse.json(data)
   } catch (error) {
     console.error("Error fetching doctors:", error)
-    return NextResponse.json({ error: "Failed to fetch doctors", details: error.message }, { status: 500 })
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    return NextResponse.json({ error: "Failed to fetch doctors", details: errorMessage }, { status: 500 })
   }
 }

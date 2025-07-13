@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { MapPin, Users, Star, Phone, Menu, X, Heart, Shield, Clock, Mail, MessageCircle, Facebook, Twitter, Instagram, Linkedin } from "lucide-react"
 import Link from "next/link"
 import { ConnectionStatus } from "@/components/connection-status"
+import { useAuth } from "@/contexts/auth-context"
 
 interface Hospital {
   id: string
@@ -52,6 +53,8 @@ export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [headerVisible, setHeaderVisible] = useState(true)
   const [lastScrollY, setLastScrollY] = useState(0)
+  const { user, loading: authLoading } = useAuth();
+
 
   useEffect(() => {
     const fetchHospitalData = async () => {
@@ -71,7 +74,10 @@ export default function HomePage() {
               status: "online" as const,
             }
           } catch (error) {
-            console.warn(`Could not fetch data for ${hospital.name}:`, error.message)
+            console.warn(
+              `Could not fetch data for ${hospital.name}:`,
+              error instanceof Error ? error.message : error
+            )
             return {
               ...hospital,
               doctorCount: "N/A" as const,
@@ -123,49 +129,28 @@ export default function HomePage() {
       lineHeight: '1.6'
     }}>
       {/* Enhanced Header */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ${headerVisible ? 'translate-y-0' : '-translate-y-full'}`} style={{
+       <header className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ${headerVisible ? 'translate-y-0' : '-translate-y-full'}`} style={{
         background: 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
         color: 'white',
         boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)'
       }}>
         <div className="container mx-auto px-6">
-          {/* Top bar with contact info */}
-          <div className="py-3 text-sm" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
-            <div className="flex justify-between items-center">
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  <Phone className="w-4 h-4" />
-                  <span>Emergency: +1 (555) 911-HELP</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Mail className="w-4 h-4" />
-                  <span>support@quickcare.com</span>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-green-200">System Online</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Main navigation */}
+          {/* Single main navigation bar */}
           <div className="py-4">
             <div className="flex items-center justify-between">
+              {/* Logo and Brand */}
               <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                    <Heart className="w-5 h-5 text-blue-500" />
-                  </div>
-                  <div>
-                    <h1 className="text-2xl font-black tracking-tight">QuickCare</h1>
-                    <p className="text-white/80 text-xs font-medium">Healthcare Management System</p>
-                  </div>
+                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+                  <Heart className="w-5 h-5 text-blue-500" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-black tracking-tight">QuickCare</h1>
+                  <p className="text-white/70 text-xs font-medium">Healthcare Management</p>
                 </div>
               </div>
 
-              {/* Desktop Navigation */}
-              <nav className="hidden md:flex items-center space-x-8">
+              {/* Desktop Navigation - Left aligned */}
+              <nav className="hidden md:flex items-center space-x-6 flex-1 justify-start ml-12">
                 {navigationItems.map((item) => (
                   <Link
                     key={item.name}
@@ -176,6 +161,20 @@ export default function HomePage() {
                   </Link>
                 ))}
               </nav>
+
+              {/* System Status - Right aligned */}
+                    <div className="hidden md:flex items-center space-x-4">
+        {!loading && !user ? (
+          <Link href="/login">
+            <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700">
+              Login
+            </Button>
+          </Link>
+        ) : (
+          <span className="text-green-200 text-sm font-medium">Welcome, {user?.name}</span>
+        )}
+      </div>
+
 
               {/* Mobile menu button */}
               <button
@@ -192,18 +191,27 @@ export default function HomePage() {
 
             {/* Mobile Navigation */}
             {mobileMenuOpen && (
-              <nav className="md:hidden mt-4 pb-4 pt-4" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
-                {navigationItems.map((item) => (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className="block py-3 text-white/80 hover:text-white transition-colors duration-200 uppercase tracking-wide font-medium"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {item.name}
-                  </Link>
-                ))}
-              </nav>
+              <div className="md:hidden">
+                <div className="pt-4 pb-2" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                  <nav className="space-y-1">
+                    {navigationItems.map((item) => (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        className="block py-2 text-white/80 hover:text-white transition-colors duration-200 uppercase tracking-wide font-medium text-sm"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {item.name}
+                      </Link>
+                    ))}
+                  </nav>
+                  {/* Mobile System Status */}
+                  <div className="flex items-center space-x-2 mt-4 pt-3" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="text-green-200 text-sm font-medium">System Online</span>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </div>
