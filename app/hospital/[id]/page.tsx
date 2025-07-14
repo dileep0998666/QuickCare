@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, MapPin, Phone, Clock, Star, Users, IndianRupee } from "lucide-react"
 import Link from "next/link"
 import { BookingModal } from "@/components/booking-modal"
+import Image from "next/image"
 
 interface Doctor {
   _id: string
@@ -27,6 +28,8 @@ interface Hospital {
   phone: string
   workingHours: string
   rating: number
+  image: string
+  gallery: string[]
 }
 
 const hospitalInfo: Record<string, Hospital> = {
@@ -39,6 +42,13 @@ const hospitalInfo: Record<string, Hospital> = {
     phone: "+1 (555) 123-4567",
     workingHours: "24/7 Emergency | OPD: 8:00 AM - 8:00 PM",
     rating: 4.8,
+    image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&h=400&fit=crop",
+    gallery: [
+      "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1551190822-a9333d879b1f?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=400&h=300&fit=crop"
+    ]
   },
   hospb: {
     id: "hospb",
@@ -49,6 +59,13 @@ const hospitalInfo: Record<string, Hospital> = {
     phone: "+1 (555) 987-6543",
     workingHours: "24/7 Emergency | OPD: 9:00 AM - 7:00 PM",
     rating: 4.6,
+    image: "https://images.unsplash.com/photo-1516841273335-e39b37888115?w=800&h=400&fit=crop",
+    gallery: [
+      "https://images.unsplash.com/photo-1512678080530-7760d81faba6?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1579154204601-01588f351e67?w=400&h=300&fit=crop"
+    ]
   },
 }
 
@@ -184,6 +201,18 @@ export default function HospitalPage() {
       </header>
 
       <main className="container mx-auto px-6 py-8">
+        {/* Hospital Main Image */}
+        <div className="mb-8 rounded-lg overflow-hidden shadow-md">
+          <Image
+            src={hospital.image}
+            alt={hospital.name}
+            width={800}
+            height={400}
+            className="w-full h-64 md:h-80 object-cover"
+            priority
+          />
+        </div>
+
         {/* Hospital Info */}
         <Card className="mb-8 border-0 shadow-md">
           <CardHeader>
@@ -215,6 +244,24 @@ export default function HospitalPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Hospital Gallery */}
+        <div className="mb-8">
+          <h3 className="text-xl font-semibold text-slate-800 mb-4">Hospital Gallery</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {hospital.gallery.map((imageUrl, index) => (
+              <div key={index} className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+                <Image
+                  src={imageUrl}
+                  alt={`${hospital.name} - Image ${index + 1}`}
+                  width={400}
+                  height={300}
+                  className="w-full h-32 md:h-40 object-cover hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* Doctors Section */}
         <div className="mb-6">
