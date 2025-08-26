@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
+import { Button } from "../../components/ui/button"
+import { Badge } from "../../components/ui/badge"
 import { ArrowLeft, MapPin, Phone, Clock, Star, Users, IndianRupee } from "lucide-react"
 import Link from "next/link"
-import { BookingModal } from "@/components/booking-modal"
+import { BookingModal } from "../../components/booking-modal"
 import Image from "next/image"
+
 
 interface Doctor {
   _id: string
