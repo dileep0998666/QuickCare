@@ -1,11 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
+import { Button } from "../../components/ui/button"
 import { MapPin, Users, Star, Phone, Menu, X, Heart, Shield, Clock, Mail, MessageCircle } from "lucide-react"
 import Link from "next/link"
-import { ConnectionStatus } from "@/components/connection-status"
-import { useAuth } from "@/contexts/auth-context"
+import { ConnectionStatus } from "../../components/connection-status"
+import { useAuth } from "../../contexts/auth-context"
+
 
 interface Hospital {
   id: string
