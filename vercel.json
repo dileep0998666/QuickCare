@@ -10,12 +10,7 @@
       "dest": "/$1"
     }
   ],
-  "env": {
-    "MONGODB_URI": "@mongodb_uri",
-    "JWT_SECRET": "@jwt_secret",
-    "NEXT_PUBLIC_GOOGLE_CLIENT_ID": "@google_client_id",
-    "GOOGLE_CLIENT_SECRET": "@google_client_secret"
-  },
+  
   "functions": {
     "app/api/**/*.ts": {
       "maxDuration": 30
