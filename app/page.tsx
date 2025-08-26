@@ -43,7 +43,7 @@ export default function HomePage() {
   const [headerVisible, setHeaderVisible] = useState(true)
   const [lastScrollY, setLastScrollY] = useState(0)
   const router = useRouter()
-  const { user, loading } = useAuth()
+  const { user, loading, logout } = useAuth()
 
   // Handle header visibility on scroll
   useEffect(() => {
@@ -113,11 +113,12 @@ export default function HomePage() {
             <div className="flex items-center justify-between">
               {/* Enhanced Logo */}
               <div className="flex items-center space-x-4">
-                <div className="relative">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-lg">
-                    <Heart className="w-6 h-6 text-white" />
+                <div className="relative group">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:rotate-3">
+                    <Heart className="w-6 h-6 text-white transition-all duration-300 group-hover:scale-110" />
                   </div>
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white animate-pulse shadow-sm"></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-cyan-300 rounded-xl opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-xl"></div>
                 </div>
                 <div>
                   <h1 className="text-2xl font-black tracking-tight bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
@@ -133,10 +134,10 @@ export default function HomePage() {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className="relative text-slate-300 hover:text-white transition-all duration-300 text-sm font-semibold uppercase tracking-wider group"
+                    className="relative text-slate-300 hover:text-white transition-all duration-300 text-sm font-semibold uppercase tracking-wider group px-3 py-2 rounded-lg hover:bg-slate-800/30"
                   >
                     {item.name}
-                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-cyan-400 transition-all duration-300 group-hover:w-full"></span>
+                    <span className="absolute -bottom-1 left-3 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-cyan-400 transition-all duration-300 group-hover:w-[calc(100%-24px)] rounded-full"></span>
                   </Link>
                 ))}
               </nav>
@@ -145,14 +146,25 @@ export default function HomePage() {
               <div className="hidden md:flex items-center space-x-4">
                 {!loading && !user ? (
                   <Link href="/login">
-                    <Button className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold px-6 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                      Login
+                    <Button className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold px-6 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-0.5 active:scale-95 relative overflow-hidden group">
+                      <span className="relative z-10">Login</span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </Button>
                   </Link>
                 ) : (
-                  <div className="flex items-center space-x-3 bg-slate-800/50 px-4 py-2 rounded-full border border-slate-700">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <span className="text-green-200 text-sm font-semibold">Welcome, {user?.name}</span>
+                  <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-3 bg-slate-800/50 px-4 py-2 rounded-full border border-slate-700 backdrop-blur-sm hover:bg-slate-800/70 transition-all duration-300">
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-sm"></div>
+                      <span className="text-green-200 text-sm font-semibold">Welcome, {user?.name}</span>
+                    </div>
+                    <Button
+                      onClick={logout}
+                      variant="outline"
+                      size="sm"
+                      className="text-white border-white/20 hover:bg-white/10 bg-transparent font-semibold"
+                    >
+                      Logout
+                    </Button>
                   </div>
                 )}
               </div>
@@ -183,11 +195,28 @@ export default function HomePage() {
                     ))}
                   </nav>
                   <div
-                    className="flex items-center space-x-3 mt-6 pt-4 px-4"
+                    className="flex items-center justify-between mt-6 pt-4 px-4"
                     style={{ borderTop: "1px solid rgba(255, 255, 255, 0.1)" }}
                   >
-                    <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                    <span className="text-green-200 text-sm font-semibold">System Online</span>
+                    <div className="flex items-center space-x-3">
+                      <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                      <span className="text-green-200 text-sm font-semibold">
+                        {user ? `Welcome, ${user.name}` : "System Online"}
+                      </span>
+                    </div>
+                    {user && (
+                      <Button
+                        onClick={() => {
+                          logout()
+                          setMobileMenuOpen(false)
+                        }}
+                        variant="outline"
+                        size="sm"
+                        className="text-white border-white/20 hover:bg-white/10 bg-transparent text-xs"
+                      >
+                        Logout
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -247,7 +276,7 @@ export default function HomePage() {
                 <button
                   key={city.id}
                   onClick={() => handleCitySelect(city.id)}
-                  className={`relative p-6 rounded-xl border-2 transition-all duration-500 font-bold text-lg group overflow-hidden ${
+                  className={`relative p-6 rounded-xl border-2 transition-all duration-500 font-bold text-lg group overflow-hidden hover:-translate-y-1 ${
                     selectedCity === city.id
                       ? "border-blue-500 bg-gradient-to-br from-blue-50 to-cyan-50 text-blue-700 shadow-xl scale-105"
                       : "border-slate-200 hover:border-slate-300 hover:bg-slate-50 hover:shadow-lg hover:scale-102"
@@ -257,16 +286,17 @@ export default function HomePage() {
                   }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-t-xl"></div>
                   <div className="relative flex flex-col items-center space-y-3">
-                    <span className="font-black text-lg">{city.name}</span>
+                    <span className="font-black text-lg transition-all duration-300 group-hover:scale-105">{city.name}</span>
                     {city.available ? (
                       <div className="flex items-center space-x-2">
-                        <CheckCircle className="w-5 h-5 text-green-500" />
+                        <CheckCircle className="w-5 h-5 text-green-500 transition-all duration-300 group-hover:scale-110" />
                         <span className="text-sm font-semibold text-green-600">Available</span>
                       </div>
                     ) : (
                       <div className="flex items-center space-x-2">
-                        <Clock className="w-4 h-4 text-amber-500" />
+                        <Clock className="w-4 h-4 text-amber-500 transition-all duration-300 group-hover:scale-110" />
                         <span className="text-sm font-semibold text-amber-600">Coming Soon</span>
                       </div>
                     )}
@@ -276,14 +306,14 @@ export default function HomePage() {
             </div>
 
             {selectedCity === "hyderabad" && (
-              <div className="text-center p-6 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 shadow-lg">
+              <div className="text-center p-6 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 shadow-lg animate-in slide-in-from-bottom duration-500">
                 <div className="flex items-center justify-center space-x-3 mb-3">
-                  <CheckCircle className="w-8 h-8 text-green-500 animate-pulse" />
+                  <CheckCircle className="w-8 h-8 text-green-500 animate-bounce" />
                   <span className="text-2xl font-black text-green-700">Perfect Choice!</span>
                 </div>
                 <p className="font-bold text-green-600 text-lg">Redirecting to available hospitals in Hyderabad...</p>
-                <div className="mt-4 w-full bg-green-200 rounded-full h-2">
-                  <div className="bg-green-500 h-2 rounded-full animate-pulse" style={{ width: "100%" }}></div>
+                <div className="mt-4 w-full bg-green-200 rounded-full h-3 overflow-hidden">
+                  <div className="bg-gradient-to-r from-green-500 to-emerald-500 h-3 rounded-full animate-pulse shadow-sm" style={{ width: "100%" }}></div>
                 </div>
               </div>
             )}
@@ -305,9 +335,10 @@ export default function HomePage() {
                     setSelectedCity("")
                     setShowUnavailableMessage(false)
                   }}
-                  className="px-8 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-white rounded-xl font-bold hover:from-amber-600 hover:to-yellow-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                  className="px-8 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-white rounded-xl font-bold hover:from-amber-600 hover:to-yellow-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 hover:-translate-y-1 active:scale-95 relative overflow-hidden group"
                 >
-                  Select Another City
+                  <span className="relative z-10">Select Another City</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </button>
               </div>
             )}

@@ -36,10 +36,10 @@ const hospitalInfo: Record<string, Hospital> = {
   hospa: {
     id: "hospa",
     name: "QuickCare Hospital A",
-    location: "Downtown Medical District, City Center",
+    location: "Hyderabad",
     description:
       "Premier healthcare facility with state-of-the-art equipment and experienced medical professionals. We provide comprehensive medical services with a focus on patient care and advanced treatments.",
-    phone: "+1 (555) 123-4567",
+    phone: "+91 9894398593",
     workingHours: "24/7 Emergency | OPD: 8:00 AM - 8:00 PM",
     rating: 4.8,
     image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&h=400&fit=crop",
@@ -53,7 +53,7 @@ const hospitalInfo: Record<string, Hospital> = {
   hospb: {
     id: "hospb",
     name: "QuickCare Hospital B",
-    location: "Riverside Medical Campus, North District",
+    location: "Hyderabad",
     description:
       "Comprehensive medical center specializing in advanced treatments and patient care. Our team of experienced doctors provides quality healthcare services across multiple specializations.",
     phone: "+1 (555) 987-6543",
@@ -79,7 +79,12 @@ export default function HospitalPage() {
   const [rating, setRating] = useState<number>(0)
   const [reviewText, setReviewText] = useState("")
   const [submitting, setSubmitting] = useState(false)
-  const [reviews, setReviews] = useState<{ rating: number; comment: string; createdAt: string }[]>([])
+  const [reviews, setReviews] = useState<{
+    rating: number;
+    comment: string;
+    createdAt: string;
+    userId?: { name: string } | null;
+  }[]>([])
 
   const hospital = hospitalInfo[hospitalId]
 
@@ -92,7 +97,12 @@ export default function HospitalPage() {
 
   const fetchDoctors = async () => {
     try {
-      const response = await fetch(`/api/hospitals/${hospitalId}/doctors`)
+      const response = await fetch(`/api/hospitals/${hospitalId}/doctors`, {
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
@@ -117,6 +127,7 @@ export default function HospitalPage() {
       }
     } catch (err) {
       console.error("Fetch Reviews Error:", err)
+      setReviews([])
     }
   }
 
@@ -125,41 +136,42 @@ export default function HospitalPage() {
     setShowBookingModal(true)
   }
 
- const submitReview = async () => {
-  if (rating === 0) return alert("Please select a rating before submitting");
-  setSubmitting(true);
+  const submitReview = async () => {
+    if (rating === 0) return alert("Please select a rating before submitting");
+    setSubmitting(true);
 
-  try {
-    const res = await fetch(`/api/hospitals/${hospitalId}/review`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ rating, comment: reviewText }),
-    });
+    try {
+      const res = await fetch(`/api/hospitals/${hospitalId}/review`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rating, comment: reviewText }),
+      });
 
-    let data: any = {};
-    const contentType = res.headers.get("content-type");
+      let data: any = {};
+      const contentType = res.headers.get("content-type");
 
-    if (contentType && contentType.includes("application/json")) {
-      data = await res.json();
-    } else {
-      const text = await res.text();
-      console.error("❌ Unexpected (non-JSON) response:", text);
-      throw new Error("Server returned non-JSON response");
+      if (contentType && contentType.includes("application/json")) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        console.error("❌ Unexpected (non-JSON) response:", text);
+        throw new Error("Server returned non-JSON response");
+      }
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to submit review");
+      }
+
+      alert("✅ Review submitted");
+      setRating(0);
+      setReviewText("");
+      fetchReviews(); // Refresh reviews after submission
+    } catch (error: any) {
+      alert(`❌ Error: ${error.message}`);
+    } finally {
+      setSubmitting(false);
     }
-
-    if (!res.ok) {
-      throw new Error(data.message || "Failed to submit review");
-    }
-
-    alert("✅ Review submitted");
-    setRating(0);
-    setReviewText("");
-  } catch (error: any) {
-    alert(`❌ Error: ${error.message}`);
-  } finally {
-    setSubmitting(false);
-  }
-};
+  };
 
   if (!hospital) {
     return (
@@ -348,23 +360,43 @@ export default function HospitalPage() {
         <div className="mb-10">
           <h3 className="text-xl font-semibold text-slate-700 mb-4">Patient Reviews</h3>
           {reviews.length > 0 ? (
-  reviews.map((r, idx) => (
-    <div key={idx} className="mb-4 border-b pb-2">
-      <div className="flex items-center gap-2">
-        <span className="font-semibold text-slate-800">{r.userId?.name || "Anonymous"}</span>
-        <div className="flex items-center gap-1 text-yellow-500">
-          {Array.from({ length: r.rating }, (_, i) => (
-            <span key={i}>★</span>
-          ))}
-        </div>
-      </div>
-      <p className="text-slate-700 text-sm mt-1">{r.comment}</p>
-    </div>
-  ))
-) : (
-  <p className="text-slate-500 text-sm">No reviews yet.</p>
-)}
-
+            <div className="space-y-4">
+              {reviews.map((review, idx) => (
+                <Card key={idx} className="border border-gray-200">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-semibold text-slate-800">
+                        {review.userId?.name || "Anonymous Patient"}
+                      </span>
+                      <div className="flex items-center gap-1 text-yellow-500">
+                        {Array.from({ length: review.rating }, (_, i) => (
+                          <Star key={i} className="w-4 h-4 fill-current" />
+                        ))}
+                        <span className="ml-1 text-sm text-gray-600">({review.rating}/5)</span>
+                      </div>
+                    </div>
+                    {review.comment && (
+                      <p className="text-slate-700 text-sm leading-relaxed">{review.comment}</p>
+                    )}
+                    <p className="text-xs text-gray-500 mt-2">
+                      {new Date(review.createdAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <Card className="border border-gray-200">
+              <CardContent className="p-6 text-center">
+                <Star className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                <p className="text-slate-500">No reviews yet. Be the first to review this hospital!</p>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Review Form */}

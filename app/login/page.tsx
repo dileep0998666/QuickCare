@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -13,6 +13,13 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Eye, EyeOff, Heart, ArrowLeft, Mail, Lock } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 
+declare global {
+  interface Window {
+    google: any;
+    handleCredentialResponse?: (response: any) => void;
+  }
+}
+
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -20,8 +27,92 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
-  const { login } = useAuth()
+  const { login, googleLogin } = useAuth()
   const router = useRouter()
+
+  const handleGoogleCallback = useCallback(async (response: any) => {
+    try {
+      setLoading(true)
+      setError("")
+
+      const result = await googleLogin(response.credential)
+
+      if (result.success) {
+        router.push("/dashboard")
+      } else {
+        setError(result.message || 'Google sign-in failed')
+      }
+    } catch (error) {
+      setError('Network error. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }, [googleLogin, router])
+
+  useEffect(() => {
+    // Debug: Check if environment variable is available
+    console.log('Environment check:', {
+      googleClientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+      nodeEnv: process.env.NODE_ENV
+    })
+    
+    // Set global callback function
+    window.handleCredentialResponse = handleGoogleCallback
+    
+    // Load Google Sign-In script
+    const script = document.createElement('script')
+    script.src = 'https://accounts.google.com/gsi/client'
+    script.async = true
+    script.defer = true
+    
+    const handleScriptLoad = () => {
+      if (window.google) {
+        const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
+        console.log('Google Client ID:', clientId) // Debug log
+        
+        if (!clientId) {
+          console.error('Google Client ID not found')
+          setError('Google Sign-In configuration error')
+          return
+        }
+        
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: handleGoogleCallback,
+        })
+        
+        // Render the button
+        const buttonElement = document.getElementById("google-signin-button")
+        if (buttonElement) {
+          window.google.accounts.id.renderButton(
+            buttonElement,
+            { 
+              theme: "outline", 
+              size: "large",
+              width: "100%",
+              text: "continue_with"
+            }
+          )
+        }
+      }
+    }
+    
+    script.onload = handleScriptLoad
+    document.body.appendChild(script)
+
+    return () => {
+      // Cleanup
+      const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]')
+      if (existingScript && document.body.contains(existingScript)) {
+        document.body.removeChild(existingScript)
+      }
+      if (window.handleCredentialResponse) {
+        delete window.handleCredentialResponse
+      }
+    }
+  }, [handleGoogleCallback])
+
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -87,11 +178,12 @@ export default function LoginPage() {
       <main className="flex-grow flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-md">
           <Card
-            className="border-0 shadow-lg"
+            className="border-0 shadow-lg backdrop-blur-sm"
             style={{
-              background: "#ffffff",
-              borderRadius: "12px",
-              boxShadow: "0 8px 25px rgba(0, 0, 0, 0.1)",
+              background: "rgba(255, 255, 255, 0.95)",
+              borderRadius: "16px",
+              boxShadow: "0 20px 40px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.8)",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
             }}
           >
             <CardHeader className="text-center pb-6">
@@ -102,6 +194,20 @@ export default function LoginPage() {
             </CardHeader>
 
             <CardContent>
+              {/* Google Sign In Button */}
+              <div className="mb-6">
+                <div id="google-signin-button" className="w-full"></div>
+              </div>
+
+              <div className="relative mb-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500 font-medium">Or continue with email</span>
+                </div>
+              </div>
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 {error && (
                   <Alert className="border-red-200 bg-red-50">
@@ -121,7 +227,7 @@ export default function LoginPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter your email"
-                      className="pl-10 h-12 border-2 border-gray-200 focus:border-blue-500"
+                      className="pl-10 h-12 border-2 border-gray-200 focus:border-blue-500 transition-all duration-300 hover:border-gray-300 focus:shadow-lg"
                       required
                     />
                   </div>
@@ -139,7 +245,7 @@ export default function LoginPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your password"
-                      className="pl-10 pr-10 h-12 border-2 border-gray-200 focus:border-blue-500"
+                      className="pl-10 pr-10 h-12 border-2 border-gray-200 focus:border-blue-500 transition-all duration-300 hover:border-gray-300 focus:shadow-lg"
                       required
                     />
                     <button
@@ -155,13 +261,20 @@ export default function LoginPage() {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full h-12 font-bold text-sm uppercase tracking-wide transition-all duration-300"
+                  className="w-full h-12 font-bold text-sm uppercase tracking-wide transition-all duration-300 hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
                   style={{
-                    background: "#2c3e50",
+                    background: "linear-gradient(135deg, #2c3e50 0%, #34495e 100%)",
                     color: "white",
                   }}
                 >
-                  {loading ? "Signing In..." : "Sign In"}
+                  {loading ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Signing In...</span>
+                    </div>
+                  ) : (
+                    "Sign In"
+                  )}
                 </Button>
               </form>
 

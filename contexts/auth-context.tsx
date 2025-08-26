@@ -10,12 +10,15 @@ interface User {
   email: string
   phone?: string
   role: string
+  avatar?: string
+  isGoogleUser?: boolean
 }
 
 interface AuthContextType {
   user: User | null
   loading: boolean
   login: (email: string, password: string) => Promise<{ success: boolean; message: string }>
+  googleLogin: (credential: string) => Promise<{ success: boolean; message: string }>
   signup: (
     name: string,
     email: string,
@@ -42,6 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await fetch("/api/auth/me", {
         credentials: "include",
+        cache: 'no-store'
       })
 
       if (response.ok) {
@@ -119,6 +123,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const googleLogin = async (credential: string) => {
+    try {
+      const response = await fetch("/api/auth/google", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ credential }),
+        credentials: "include",
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setUser(data.user)
+        return { success: true, message: data.message }
+      } else {
+        return { success: false, message: data.message }
+      }
+    } catch (error) {
+      console.error("Google login error:", error)
+      return { success: false, message: "Network error. Please try again." }
+    }
+  }
+
   const refreshUser = async () => {
     await checkAuth()
   }
@@ -127,6 +156,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     loading,
     login,
+    googleLogin,
     signup,
     logout,
     refreshUser,

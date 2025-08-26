@@ -8,7 +8,6 @@ interface ConnectionStatusProps {
   hospitals: Array<{
     id: string
     name: string
-    url: string
     status?: "online" | "offline" | "checking"
   }>
 }
