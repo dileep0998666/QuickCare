@@ -30,10 +30,10 @@ Go to Settings → Environment Variables and add:
 
 | Variable | Value | Environment |
 |----------|-------|-------------|
-| `MONGODB_URI` | `mongodb+srv://dileepkumar09956:quickcare@cluster0.6i4bfsn.mongodb.net/quickcare-client?retryWrites=true&w=majority&appName=Cluster0` | All |
-| `JWT_SECRET` | `quickcare-dileepkumar09956-rishi31-production-ready-secret-key` | All |
-| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | `698551724330-visq3borrjac575a2cu7uv7kj6b1o229.apps.googleusercontent.com` | All |
-| `GOOGLE_CLIENT_SECRET` | `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` | All |
+| `MONGODB_URI` | `mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=majority` | All |
+| `JWT_SECRET` | `your-super-secret-jwt-key-change-in-production` | All |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | `your-google-client-id.apps.googleusercontent.com` | All |
+| `GOOGLE_CLIENT_SECRET` | `your-google-client-secret` | All |
 | `NODE_ENV` | `production` | Production only |
 
 ### 4. Deploy
