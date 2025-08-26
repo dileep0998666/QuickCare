@@ -7,6 +7,9 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   serverExternalPackages: ['mongoose', 'bcryptjs'],
+  experimental: {
+    esmExternals: 'loose',
+  },
   images: {
     unoptimized: true,
     domains: ['images.unsplash.com', 'lh3.googleusercontent.com'],
