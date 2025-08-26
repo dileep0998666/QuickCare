@@ -29,6 +29,10 @@ yarn-error.log*
 .env*.local
 .env
 
+# npm
+.npmrc
+package-lock.json
+
 # vercel
 .vercel
 

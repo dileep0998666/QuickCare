@@ -43,6 +43,34 @@ requiredScripts.forEach(script => {
   }
 });
 
+// Check React version compatibility
+console.log('\n⚛️  Checking React version:');
+if (packageJson.dependencies.react) {
+  const reactVersion = packageJson.dependencies.react;
+  console.log(`  ✅ React version: ${reactVersion}`);
+  if (reactVersion.includes('18')) {
+    console.log('  ✅ Using React 18 for better compatibility');
+  } else if (reactVersion.includes('19')) {
+    console.log('  ⚠️  React 19 may cause dependency conflicts');
+  }
+}
+
+// Check for problematic dependencies
+console.log('\n🔍 Checking for problematic dependencies:');
+const problematicDeps = ['vaul'];
+let hasProblematicDeps = false;
+
+problematicDeps.forEach(dep => {
+  if (packageJson.dependencies[dep] || packageJson.devDependencies[dep]) {
+    console.log(`  ❌ Found problematic dependency: ${dep}`);
+    hasProblematicDeps = true;
+  }
+});
+
+if (!hasProblematicDeps) {
+  console.log('  ✅ No problematic dependencies found');
+}
+
 // Check environment variables template
 console.log('\n🔐 Checking environment variables template:');
 if (fs.existsSync('.env.example')) {
