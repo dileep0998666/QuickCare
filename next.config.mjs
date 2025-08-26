@@ -6,9 +6,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  experimental: {
-    serverComponentsExternalPackages: ['mongoose', 'bcryptjs'],
-  },
+  serverExternalPackages: ['mongoose', 'bcryptjs'],
   images: {
     unoptimized: true,
     domains: ['images.unsplash.com', 'lh3.googleusercontent.com'],
@@ -27,7 +25,7 @@ const nextConfig = {
       },
     ],
   },
-  swcMinify: true,
+
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
