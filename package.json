@@ -10,7 +10,7 @@
     "deploy:check": "node scripts/deploy.js",
     "deploy:validate": "node scripts/validate-deployment.js",
     "postbuild": "echo 'Build completed successfully!'",
-    "vercel-build": "npm install --legacy-peer-deps && next build",
+    "vercel-build": "npm install --legacy-peer-deps && npm run build",
     "clean": "rm -rf .next node_modules package-lock.json",
     "reinstall": "npm run clean && npm install --legacy-peer-deps"
   },

@@ -10,6 +10,7 @@ import Link from "next/link"
 import { BookingModal } from "@/components/booking-modal"
 import Image from "next/image"
 
+
 interface Doctor {
   _id: string
   name: string

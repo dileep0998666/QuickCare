@@ -1,4 +1,5 @@
 "use client"
+
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import {
@@ -25,7 +26,9 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+
 import { useAuth } from "@/contexts/auth-context"
+
 
 const availableCities = [
   { id: "hyderabad", name: "Hyderabad", available: true },

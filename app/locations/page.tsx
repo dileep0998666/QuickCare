@@ -7,6 +7,7 @@ import Link from "next/link"
 import { ConnectionStatus } from "@/components/connection-status"
 import { useAuth } from "@/contexts/auth-context"
 
+
 interface Hospital {
   id: string
   name: string

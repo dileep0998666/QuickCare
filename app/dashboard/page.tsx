@@ -23,6 +23,7 @@ import Link from "next/link"
 import { useAuth } from "@/contexts/auth-context"
 import { useRouter } from "next/navigation"
 
+
 interface Appointment {
   _id: string
   hospitalId: string

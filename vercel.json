@@ -1,9 +1,7 @@
 {
   "version": 2,
-<<<<<<< HEAD
   "buildCommand": "npm install --legacy-peer-deps && npm run build",
   "installCommand": "npm install --legacy-peer-deps",
-=======
   "routes": [
     {
       "src": "/api/(.*)",
@@ -14,20 +12,13 @@
       "dest": "/$1"
     }
   ],
-  
->>>>>>> 2316c9937710a46169192d48e3b0ec38ef3ddcd3
   "functions": {
     "app/api/**/*.ts": {
       "maxDuration": 30
     }
-<<<<<<< HEAD
   },
   "regions": [
     "iad1"
   ],
   "framework": "nextjs"
 }
-=======
-  }
-}
->>>>>>> 2316c9937710a46169192d48e3b0ec38ef3ddcd3
