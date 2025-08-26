@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { AuthProvider } from "@/contexts/auth-context";
+import { AuthProvider } from "../contexts/auth-context";
+
 
 export const metadata: Metadata = {
   title: "QuickCare - Healthcare Management System",
