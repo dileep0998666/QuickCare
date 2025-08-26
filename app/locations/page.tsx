@@ -1,10 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { MapPin, Users, Star, Phone, Menu, X, Heart, Shield, Clock, Mail, MessageCircle, Facebook, Twitter, Instagram, Linkedin } from "lucide-react"
+import { MapPin, Users, Star, Phone, Menu, X, Heart, Shield, Clock, Mail, MessageCircle } from "lucide-react"
 import Link from "next/link"
 import { ConnectionStatus } from "@/components/connection-status"
 import { useAuth } from "@/contexts/auth-context"
@@ -53,7 +51,7 @@ export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [headerVisible, setHeaderVisible] = useState(true)
   const [lastScrollY, setLastScrollY] = useState(0)
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, logout } = useAuth();
 
 
   useEffect(() => {
@@ -113,12 +111,7 @@ export default function HomePage() {
 
   const navigationItems = [
     { name: "Home", href: "/" },
-    { name: "Hospitals", href: "/hospitals" },
-    { name: "Doctors", href: "/doctors" },
-    { name: "Appointments", href: "/appointments" },
-    { name: "Emergency", href: "/emergency" },
-    { name: "About", href: "/about" },
-    { name: "Contact", href: "/contact" },
+    { name: "Hospitals", href: "/locations" },
   ]
 
   return (
@@ -163,17 +156,27 @@ export default function HomePage() {
               </nav>
 
               {/* System Status - Right aligned */}
-                    <div className="hidden md:flex items-center space-x-4">
-        {!loading && !user ? (
-          <Link href="/login">
-            <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700">
-              Login
-            </Button>
-          </Link>
-        ) : (
-          <span className="text-green-200 text-sm font-medium">Welcome, {user?.name}</span>
-        )}
-      </div>
+              <div className="hidden md:flex items-center space-x-4">
+                {!authLoading && !user ? (
+                  <Link href="/login">
+                    <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700">
+                      Login
+                    </Button>
+                  </Link>
+                ) : (
+                  <div className="flex items-center space-x-3">
+                    <span className="text-green-200 text-sm font-medium">Welcome, {user?.name}</span>
+                    <Button
+                      onClick={logout}
+                      variant="outline"
+                      size="sm"
+                      className="text-white border-white/20 hover:bg-white/10 bg-transparent"
+                    >
+                      Logout
+                    </Button>
+                  </div>
+                )}
+              </div>
 
 
               {/* Mobile menu button */}
@@ -251,14 +254,15 @@ export default function HomePage() {
         ) : (
           <div className="grid md:grid-cols-2 gap-8">
             {hospitalData.map((hospital) => (
-              <div key={hospital.id} className="transition-all duration-300 hover:-translate-y-1" style={{
+              <div key={hospital.id} className="group transition-all duration-500 hover:-translate-y-2 hover:scale-[1.02]" style={{
                 background: '#ffffff',
                 border: '2px solid #e9ecef',
-                borderRadius: '8px',
-                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.05)',
+                borderRadius: '12px',
+                boxShadow: '0 8px 25px rgba(0, 0, 0, 0.08)',
                 overflow: 'hidden'
               }}>
-                <div className="p-6 pb-4" style={{ background: '#f8f9fa', borderBottom: '2px solid #e9ecef' }}>
+                <div className="p-6 pb-4 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)', borderBottom: '2px solid #e9ecef' }}>
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="text-xl font-black mb-2" style={{ color: '#2c3e50' }}>{hospital.name}</h3>
@@ -267,8 +271,8 @@ export default function HomePage() {
                         {hospital.location}
                       </div>
                     </div>
-                    <div className="flex items-center space-x-1 px-3 py-1 rounded-full" style={{ background: '#fff3cd', color: '#856404' }}>
-                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    <div className="flex items-center space-x-1 px-3 py-1 rounded-full shadow-sm" style={{ background: 'linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%)', color: '#856404' }}>
+                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400 animate-pulse" />
                       <span className="text-sm font-bold">{hospital.rating}</span>
                     </div>
                   </div>
@@ -285,11 +289,16 @@ export default function HomePage() {
                   <p className="text-gray-600 font-medium leading-relaxed">{hospital.description}</p>
 
                   <div className="flex flex-wrap gap-2">
-                    {hospital.specialties.map((specialty) => (
-                      <span key={specialty} className="px-3 py-1 text-xs font-bold uppercase tracking-wide rounded-full" style={{
-                        background: '#e9ecef',
-                        color: '#2c3e50'
-                      }}>
+                    {hospital.specialties.map((specialty, index) => (
+                      <span 
+                        key={specialty} 
+                        className="px-3 py-1 text-xs font-bold uppercase tracking-wide rounded-full transition-all duration-300 hover:scale-105 cursor-default" 
+                        style={{
+                          background: `linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%)`,
+                          color: '#2c3e50',
+                          animationDelay: `${index * 100}ms`
+                        }}
+                      >
                         {specialty}
                       </span>
                     ))}
@@ -317,20 +326,20 @@ export default function HomePage() {
                   </div>
 
                   <Link href={`/hospital/${hospital.id}`} className="block">
-                    <button className="w-full py-4 px-6 font-bold text-sm uppercase tracking-wide transition-all duration-300 hover:-translate-y-1" style={{
-                      background: '#2c3e50',
+                    <button className="w-full py-4 px-6 font-bold text-sm uppercase tracking-wide transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] active:scale-[0.98] group relative overflow-hidden" style={{
+                      background: 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
                       color: 'white',
                       border: 'none',
-                      borderRadius: '6px',
-                      boxShadow: '0 2px 10px rgba(44, 62, 80, 0.1)'
-                    }} onMouseEnter={(e) => {
-                      e.currentTarget.style.background = '#34495e'
-                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(44, 62, 80, 0.2)'
-                    }} onMouseLeave={(e) => {
-                      e.currentTarget.style.background = '#2c3e50'
-                      e.currentTarget.style.boxShadow = '0 2px 10px rgba(44, 62, 80, 0.1)'
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 15px rgba(44, 62, 80, 0.2)'
                     }}>
-                      View Details & Book Appointment
+                      <span className="relative z-10 flex items-center justify-center space-x-2">
+                        <span>View Details & Book Appointment</span>
+                        <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                          <span className="text-xs">→</span>
+                        </div>
+                      </span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </button>
                   </Link>
                 </div>
@@ -359,10 +368,10 @@ export default function HomePage() {
                 Your trusted healthcare partner, providing quality medical services and connecting you with the best healthcare professionals.
               </p>
               <div className="flex space-x-4">
-                <Facebook className="w-5 h-5 text-white/70 hover:text-white cursor-pointer transition-colors" />
-                <Twitter className="w-5 h-5 text-white/70 hover:text-white cursor-pointer transition-colors" />
-                <Instagram className="w-5 h-5 text-white/70 hover:text-white cursor-pointer transition-colors" />
-                <Linkedin className="w-5 h-5 text-white/70 hover:text-white cursor-pointer transition-colors" />
+                <div className="w-5 h-5 text-white/70 hover:text-white cursor-pointer transition-colors">📘</div>
+                <div className="w-5 h-5 text-white/70 hover:text-white cursor-pointer transition-colors">🐦</div>
+                <div className="w-5 h-5 text-white/70 hover:text-white cursor-pointer transition-colors">📷</div>
+                <div className="w-5 h-5 text-white/70 hover:text-white cursor-pointer transition-colors">💼</div>
               </div>
             </div>
 
@@ -370,11 +379,8 @@ export default function HomePage() {
             <div className="space-y-4">
               <h4 className="text-lg font-black uppercase tracking-wide">Quick Links</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link href="/hospitals" className="text-white/70 hover:text-white transition-colors font-medium">Find Hospitals</Link></li>
-                <li><Link href="/doctors" className="text-white/70 hover:text-white transition-colors font-medium">Find Doctors</Link></li>
-                <li><Link href="/appointments" className="text-white/70 hover:text-white transition-colors font-medium">Book Appointment</Link></li>
-                <li><Link href="/emergency" className="text-white/70 hover:text-white transition-colors font-medium">Emergency Services</Link></li>
-                <li><Link href="/health-records" className="text-white/70 hover:text-white transition-colors font-medium">Health Records</Link></li>
+                <li><Link href="/" className="text-white/70 hover:text-white transition-colors font-medium">Home</Link></li>
+                <li><Link href="/locations" className="text-white/70 hover:text-white transition-colors font-medium">Find Hospitals</Link></li>
               </ul>
             </div>
 

@@ -1,8 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 
 const hospitalUrls: Record<string, string> = {
-  hospa: "https://quickcare-hospa-production.up.railway.app",
-  hospb: "https://quickcare-hospb-production.up.railway.app",
+  hospa: "https://quickcare-hospa.onrender.com",
+  hospb: "https://quickcare-hospb.onrender.com",
 }
 
 export async function GET(request: NextRequest, { params }: { params: { id: string; doctorId: string } }) {

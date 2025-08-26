@@ -26,7 +26,7 @@ export function verifyToken(token: string): JWTPayload | null {
 
 export async function getUserFromRequest(request: NextRequest) {
   try {
-    const token = request.cookies.get("auth-token")?.value
+    const token = request.cookies.get("token")?.value
 
     if (!token) {
       return null
@@ -76,7 +76,7 @@ export function createAuthResponse(user: any, message = "Success") {
   // Set HTTP-only cookie
   response.headers.set(
     "Set-Cookie",
-    `auth-token=${token}; HttpOnly; Path=/; Max-Age=${7 * 24 * 60 * 60}; SameSite=Strict${process.env.NODE_ENV === "production" ? "; Secure" : ""}`,
+    `token=${token}; HttpOnly; Path=/; Max-Age=${7 * 24 * 60 * 60}; SameSite=Strict${process.env.NODE_ENV === "production" ? "; Secure" : ""}`,
   )
 
   return response

@@ -18,7 +18,9 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
+      required: function() {
+        return !this.isGoogleUser; // Password not required for Google users
+      },
       minLength: [6, "Password must be at least 6 characters"],
       select: false, // Don't include password in queries by default
     },
@@ -31,6 +33,19 @@ const userSchema = new mongoose.Schema(
       enum: ["patient", "admin"],
       default: "patient",
     },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true, // Allow null values but ensure uniqueness when present
+    },
+    avatar: {
+      type: String,
+      trim: true,
+    },
+    isGoogleUser: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
@@ -39,7 +54,8 @@ const userSchema = new mongoose.Schema(
 
 // Hash password before saving
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next()
+  // Skip password hashing for Google users or if password hasn't changed
+  if (!this.isModified("password") || this.isGoogleUser) return next()
 
   try {
     const salt = await bcrypt.genSalt(12)
