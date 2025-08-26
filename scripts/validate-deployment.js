@@ -43,6 +43,7 @@ requiredScripts.forEach(script => {
   }
 });
 
+<<<<<<< HEAD
 // Check React version compatibility
 console.log('\n⚛️  Checking React version:');
 if (packageJson.dependencies.react) {
@@ -71,6 +72,8 @@ if (!hasProblematicDeps) {
   console.log('  ✅ No problematic dependencies found');
 }
 
+=======
+>>>>>>> 2316c9937710a46169192d48e3b0ec38ef3ddcd3
 // Check environment variables template
 console.log('\n🔐 Checking environment variables template:');
 if (fs.existsSync('.env.example')) {
